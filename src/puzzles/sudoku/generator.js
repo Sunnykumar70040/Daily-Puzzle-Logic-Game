@@ -35,14 +35,19 @@ const solveSudoku = (board, rng) => {
     return true;
 };
 
-export const generateSudokuPuzzle = (rng) => {
+export const generateSudokuPuzzle = (rng, difficulty = 'Easy') => {
     const fullBoard = Array(9).fill().map(() => Array(9).fill(0));
     solveSudoku(fullBoard, rng);
 
-    solveSudoku(fullBoard, rng);
-
     const puzzle = fullBoard.map(row => [...row]);
-    const cellsToRemove = 40;
+
+    let cellsToRemove;
+    switch (difficulty) {
+        case 'Easy': cellsToRemove = 30; break;
+        case 'Medium': cellsToRemove = 40; break;
+        case 'Hard': cellsToRemove = 50; break;
+        default: cellsToRemove = 30;
+    }
 
     for (let i = 0; i < cellsToRemove; i++) {
         let row = rng.range(0, 8);
@@ -61,11 +66,10 @@ export const generateSudokuPuzzle = (rng) => {
 
     return {
         type: 'sudoku',
-        return {
-            type: 'sudoku',
-            signature: 'v1-' + rng.random(),
-            initialGrid: puzzle,
-            solution: fullBoard,
-            initialState
-        };
+        signature: 'v1-' + rng.random(),
+        initialGrid: puzzle,
+        solution: fullBoard,
+        initialState,
+        difficulty
     };
+};

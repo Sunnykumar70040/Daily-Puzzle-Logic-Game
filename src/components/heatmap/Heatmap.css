@@ -1,0 +1,549 @@
+/* ===================================================
+   Heatmap — LeetCode-style Streak Calendar
+   Dark mode default, light-mode via body.light-mode
+   =================================================== */
+
+/* ---------- Page wrapper ---------- */
+.heatmap-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+}
+
+/* ---------- Header ---------- */
+.heatmap-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.heatmap-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: linear-gradient(135deg, #f97316, #facc15);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---------- Stats Row (LeetCode-style) ---------- */
+.heatmap-stats {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.heatmap-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+    min-width: 90px;
+    gap: 0.2rem;
+    transition: background 0.2s;
+}
+
+.heatmap-stat:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.stat-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.68rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+}
+
+/* ---------- Year Selector ---------- */
+.heatmap-year-bar {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.year-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #8b949e;
+    border-radius: 6px;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.18s;
+}
+
+.year-btn:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #e6edf3;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.year-btn-active {
+    background: rgba(249, 115, 22, 0.15);
+    color: #f97316;
+    border-color: rgba(249, 115, 22, 0.4);
+    font-weight: 700;
+}
+
+/* ---------- Card wrapping the grid ---------- */
+.heatmap-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 1rem;
+    overflow: hidden;
+}
+
+/* ---------- Scroll container ---------- */
+.heatmap-scroll {
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+/* custom scrollbar */
+.heatmap-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.heatmap-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.heatmap-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+}
+
+/* ---------- Grid wrapper ---------- */
+.heatmap-wrapper {
+    position: relative;
+    user-select: none;
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 100%;
+}
+
+/* ---------- Month label row ---------- */
+.heatmap-month-row {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 6px;
+}
+
+.heatmap-month-label {
+    font-size: 0.67rem;
+    color: #8b949e;
+    white-space: nowrap;
+    user-select: none;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* ---------- Body: day-labels + grid ---------- */
+.heatmap-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.heatmap-day-labels {
+    display: flex;
+    flex-direction: column;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+.heatmap-day-label {
+    font-size: 0.61rem;
+    color: #8b949e;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 4px;
+    box-sizing: border-box;
+    font-weight: 500;
+}
+
+/* ---------- Grid ---------- */
+.heatmap-grid {
+    display: flex;
+    gap: 3px;
+    padding-bottom: 2px;
+}
+
+.heatmap-column {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* ---------- Cell ---------- */
+.heatmap-cell {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    cursor: default;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+    flex-shrink: 0;
+}
+
+.heatmap-cell:hover:not(.cell-empty) {
+    transform: scale(1.5);
+    z-index: 10;
+    position: relative;
+    cursor: pointer;
+}
+
+.cell-empty {
+    background: transparent;
+    pointer-events: none;
+}
+
+/* ---------- Intensity Levels — Dark Mode ---------- */
+.cell-0 {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.cell-1 {
+    background: #0e4429;
+}
+
+.cell-2 {
+    background: #006d32;
+}
+
+.cell-3 {
+    background: #26a641;
+}
+
+.cell-4 {
+    background: #39d353;
+}
+
+/* ---------- Light mode overrides ---------- */
+body.light-mode .heatmap-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.light-mode .heatmap-month-label,
+body.light-mode .heatmap-day-label,
+body.light-mode .stat-label {
+    color: #57606a;
+}
+
+body.light-mode .stat-value {
+    color: #1f2328;
+}
+
+body.light-mode .heatmap-stat {
+    background: #f6f8fa;
+    border-color: #d0d7de;
+}
+
+body.light-mode .year-btn {
+    color: #57606a;
+    border-color: #d0d7de;
+}
+
+body.light-mode .year-btn:hover {
+    background: #f3f4f6;
+    color: #1f2328;
+}
+
+body.light-mode .year-btn-active {
+    background: #fff3e0;
+    color: #ea580c;
+    border-color: #f97316;
+}
+
+body.light-mode .cell-0 {
+    background: #ebedf0;
+    border-color: rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .cell-1 {
+    background: #9be9a8;
+}
+
+body.light-mode .cell-2 {
+    background: #40c463;
+}
+
+body.light-mode .cell-3 {
+    background: #30a14e;
+}
+
+body.light-mode .cell-4 {
+    background: #216e39;
+}
+
+/* ---------- Today indicator ---------- */
+.cell-today {
+    outline: 1.5px solid #f97316;
+    outline-offset: 1px;
+    border-radius: 2px;
+}
+
+/* ---------- Pulse for today when solved ---------- */
+@keyframes heatPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(57, 211, 83, 0.65);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(57, 211, 83, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(57, 211, 83, 0);
+    }
+}
+
+.cell-pulse {
+    animation: heatPulse 2s ease-out infinite;
+}
+
+/* ---------- Legend ---------- */
+.heatmap-legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.85rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.heatmap-legend-text {
+    font-size: 0.7rem;
+    color: #8b949e;
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.legend-label {
+    font-size: 0.68rem;
+    color: #8b949e;
+    margin: 0 4px;
+    font-weight: 500;
+}
+
+.legend-cell {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+/* ---------- Tooltip ---------- */
+.heatmap-tooltip {
+    position: fixed;
+    background: #161b22;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.78rem;
+    color: #e6edf3;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    min-width: 160px;
+    transform: translateY(-50%);
+    line-height: 1.5;
+}
+
+body.light-mode .heatmap-tooltip {
+    background: #ffffff;
+    border-color: #d0d7de;
+    color: #1f2328;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.tooltip-date {
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    color: #e6edf3;
+}
+
+body.light-mode .tooltip-date {
+    color: #1f2328;
+}
+
+.tooltip-level {
+    font-size: 0.7rem;
+    color: #3fb950;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+body.light-mode .tooltip-level {
+    color: #1a7f37;
+}
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: #8b949e;
+    font-size: 0.73rem;
+    margin-top: 0.1rem;
+}
+
+.tooltip-val {
+    font-weight: 600;
+    color: #e6edf3;
+}
+
+body.light-mode .tooltip-val {
+    color: #1f2328;
+}
+
+/* ---------- Loading ---------- */
+.heatmap-loading {
+    text-align: center;
+    color: #8b949e;
+    padding: 2rem;
+    font-size: 0.9rem;
+}
+
+/* ---------- Badges ---------- */
+.badges-container {
+    margin-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 0.9rem;
+}
+
+body.light-mode .badges-container {
+    border-top-color: #e5e7eb;
+}
+
+.badges-title {
+    font-size: 0.72rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+}
+
+.badges-grid {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 20px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.76rem;
+    animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+body.light-mode .badge-item {
+    background: #f6f8fa;
+    border-color: #d0d7de;
+}
+
+@keyframes badgePop {
+    from {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.badge-emoji {
+    font-size: 1rem;
+}
+
+.badge-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.badge-label {
+    color: #e6edf3;
+    font-weight: 600;
+    font-size: 0.76rem;
+    line-height: 1.2;
+}
+
+body.light-mode .badge-label {
+    color: #1f2328;
+}
+
+.badge-desc {
+    color: #8b949e;
+    font-size: 0.62rem;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+body.light-mode .badge-desc {
+    color: #57606a;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+    .heatmap-page-wrapper {
+        padding: 1rem 0.5rem;
+    }
+
+    .heatmap-cell,
+    .legend-cell {
+        width: 12px;
+        height: 12px;
+    }
+
+    .heatmap-stat {
+        min-width: 75px;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+}

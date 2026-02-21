@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/(api|register|login|check|generate-seed|validate-seed|leaderboard|add-score)(.*)",
+            "destination": "http://your-backend-url.vercel.app/$1$2"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}

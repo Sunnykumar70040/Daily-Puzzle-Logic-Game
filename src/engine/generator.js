@@ -36,13 +36,13 @@ function getSeedFromDate(dateString) {
     return Math.abs(hash);
 }
 
-export const generatePuzzle = (type, dateString) => {
-    const seed = getSeedFromDate(dateString);
+export const generatePuzzle = (type, dateString, difficulty = 'Easy') => {
+    const seed = getSeedFromDate(dateString + difficulty); // Include difficulty in seed
     const rng = new SeededRNG(seed);
 
     switch (type) {
         case 'sudoku':
-            return generateSudokuPuzzle(rng);
+            return generateSudokuPuzzle(rng, difficulty);
         case 'sequence':
             return generateSequence(rng);
         case 'pattern':

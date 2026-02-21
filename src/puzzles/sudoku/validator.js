@@ -3,7 +3,7 @@ export const validateSudokuState = (currentState, puzzleData) => {
     const { solution } = puzzleData;
     const errors = [];
 
-    const errors = [];
+
 
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
@@ -19,7 +19,6 @@ export const validateSudokuState = (currentState, puzzleData) => {
             }
         }
     }
-}
 
-return { valid: errors.length === 0, errors };
+    return { valid: errors.length === 0, errors };
 };
