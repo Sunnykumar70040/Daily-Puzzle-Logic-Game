@@ -1,0 +1,65 @@
+/* ===== Sudoku Board Wrapper ===== */
+.sudoku-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* ===== Main Grid ===== */
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+
+  width: 600px;              /* 🔥 Increased size */
+  height: 600px;             /* 🔥 Increased size */
+
+  background: rgba(255, 255, 255, 0.95);
+  border: 4px solid #111;
+  border-radius: 12px;
+  overflow: hidden;
+
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Each Cell ===== */
+.sudoku-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 1.6rem;         /* 🔥 Bigger numbers */
+  font-weight: bold;
+
+  border: 1px solid #999;
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+/* Hover Effect */
+.sudoku-cell:hover {
+  background-color: #e0f2fe;
+}
+
+/* ===== 3x3 Thick Borders ===== */
+.sudoku-cell:nth-child(3n) {
+  border-right: 3px solid black;
+}
+
+.sudoku-cell:nth-child(n + 19):nth-child(-n + 27),
+.sudoku-cell:nth-child(n + 46):nth-child(-n + 54) {
+  border-bottom: 3px solid black;
+}
+
+/* ===== Fixed (Given) Numbers ===== */
+.sudoku-cell.fixed {
+  background-color: #f3f4f6;
+  color: #111;
+}
+
+/* ===== Selected Cell ===== */
+.sudoku-cell.selected {
+  background-color: #bfdbfe;
+}
