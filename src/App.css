@@ -3,46 +3,57 @@
 /* ============================= */
 
 :root {
-  --bg-gradient: linear-gradient(to right, #0f0c29, #302b63, #24243e);
-  --panel-bg: rgba(30, 32, 60, 0.85);
+  /* Dark Mode (Default) - Sleek, deep colors matching a modern premium app */
+  --bg-color: #0d1117;
+  --bg-gradient: radial-gradient(circle at top left, #1f2937, #0d1117 80%);
+  --panel-bg: rgba(22, 27, 34, 0.7);
   --panel-border: rgba(255, 255, 255, 0.08);
 
-  --primary-color: #4a90e2;
-  --secondary-color: #7b61ff;
-  --accent-color: #f5a623;
+  --primary-color: #58a6ff;
+  --primary-hover: #79c0ff;
+  --secondary-color: #8b949e;
+  --accent-color: #f78166;
 
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0b0;
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
 
-  --error-color: #ff4b4b;
-  --success-color: #2ecc71;
+  --error-color: #f85149;
+  --success-color: #2ea043;
 
-  --grid-line: #1e1e2e;
-  --cell-bg: #232338;
-  --cell-active: #2f2f4a;
-  --cell-highlight: #363654;
+  --grid-line: #30363d;
+  --cell-bg: #161b22;
+  --cell-active: #1f2937;
+  --cell-highlight: rgba(88, 166, 255, 0.15);
+  
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 /* 🌞 Light Mode */
 body.light-mode {
-  --bg-gradient: linear-gradient(to right, #e0eafc, #cfdef3);
+  --bg-color: #f6f8fa;
+  --bg-gradient: radial-gradient(circle at top left, #ffffff, #f3f4f6 80%);
   --panel-bg: rgba(255, 255, 255, 0.85);
-  --panel-border: rgba(0, 0, 0, 0.08);
+  --panel-border: rgba(31, 35, 40, 0.1);
 
-  --primary-color: #2563eb;
-  --secondary-color: #4f46e5;
-  --accent-color: #f59e0b;
+  --primary-color: #0969da;
+  --primary-hover: #0550ae;
+  --secondary-color: #57606a;
+  --accent-color: #cf222e;
 
-  --text-primary: #1f2937;
-  --text-secondary: #4b5563;
+  --text-primary: #1f2328;
+  --text-secondary: #656d76;
 
-  --error-color: #dc2626;
-  --success-color: #16a34a;
+  --error-color: #cf222e;
+  --success-color: #1a7f37;
 
-  --grid-line: #d1d5db;
+  --grid-line: #d0d7de;
   --cell-bg: #ffffff;
-  --cell-active: #eff6ff;
-  --cell-highlight: #f3f4f6;
+  --cell-active: #f3f4f6;
+  --cell-highlight: rgba(9, 105, 218, 0.1);
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================= */
@@ -52,67 +63,80 @@ body.light-mode {
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background: var(--bg-gradient);
+  background-color: var(--bg-color);
+  background-image: var(--bg-gradient);
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
 #root {
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
+
+/* ============================= */
+/* MAIN LAYOUT (MOBILE-FIRST) */
+/* ============================= */
 
 .App {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
-  position: relative;
-  z-index: 1;
+  padding: 1rem;
   box-sizing: border-box;
+  flex: 1;
 }
 
 /* ============================= */
 /* FLOATING BACKGROUND */
 /* ============================= */
+@keyframes floatDown {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: var(--custom-opacity, 0.5); }
+  90% { opacity: var(--custom-opacity, 0.5); }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
 
 .floating-numbers-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+  top: 0; left: 0; 
+  width: 100vw; height: 100vh;
+  pointer-events: none; /* Let clicks pass through except on the numbers themselves */
   overflow: hidden;
+  z-index: 0;
 }
 
 .floating-number {
   position: absolute;
-  top: -10%;
-  color: var(--text-primary);
-  font-weight: bold;
-  animation: fall linear infinite;
+  top: -10vh;
+  animation-name: floatDown;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
   user-select: none;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s, color 0.2s, text-shadow 0.2s;
+  pointer-events: auto; /* Make the numbers themselves interactive */
+  color: var(--text-secondary);
+  opacity: var(--custom-opacity, 0.5);
 }
 
-@keyframes fall {
-  0% {
-    transform: translateY(-100px) rotate(0deg);
-  }
-
-  100% {
-    transform: translateY(110vh) rotate(360deg);
-  }
+.floating-number:hover {
+  transform: scale(1.5) !important;
+  color: var(--primary-color);
+  opacity: 1 !important;
+  text-shadow: 0 0 10px var(--primary-color);
+  animation-play-state: paused;
 }
 
 /* ============================= */
@@ -124,16 +148,18 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 2;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--panel-border);
+  margin-bottom: 0.5rem;
 }
 
 h1 {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   margin: 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   cursor: pointer;
@@ -148,27 +174,35 @@ h1 {
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:hover {
-  color: var(--text-primary);
-  transform: scale(1.15);
+  color: var(--primary-color);
+  background: var(--cell-active);
 }
 
 /* ============================= */
-/* GLASS PANEL */
+/* GLASS PANEL AND CARDS */
 /* ============================= */
 
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+  width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* ============================= */
@@ -179,30 +213,36 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 1rem;
-  color: var(--text-secondary);
+  font-size: 0.9rem;
   font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0;
 }
 
 .game-info select {
-  background: transparent;
+  background: var(--cell-bg);
   color: var(--text-primary);
-  border: none;
-  font-size: 1rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
   cursor: pointer;
+  outline: none;
+}
+
+.game-info select:focus {
+  border-color: var(--primary-color);
 }
 
 .timer {
   font-variant-numeric: tabular-nums;
-  font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .mistakes {
   color: var(--error-color);
+  font-weight: 600;
 }
 
 /* ============================= */
@@ -210,37 +250,46 @@ h1 {
 /* ============================= */
 
 .action-btn {
-  padding: 0.8rem 1.5rem;
+  padding: 0.75rem 1.2rem;
   border-radius: 8px;
   border: none;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary {
   background: var(--primary-color);
-  color: white;
+  color: #fff;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
+  background: var(--primary-hover);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
+  border: 1px solid var(--panel-border);
   color: var(--text-primary);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--cell-active);
 }
 
 .btn-accent {
   background: var(--accent-color);
-  color: black;
+  color: #fff;
 }
 
 .btn-accent:hover {
@@ -253,33 +302,73 @@ h1 {
 
 .app-footer {
   width: 100%;
-  padding: 1.5rem;
+  padding: 1rem;
   text-align: center;
   margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .app-footer h3 {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 /* ============================= */
-/* RESPONSIVE */
+/* MODALS */
+/* ============================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  max-width: 90%;
+  width: 320px;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--text-primary);
+}
+
+.modal-content p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* ============================= */
+/* RESPONSIVE DESKTOP OVERRIDES */
 /* ============================= */
 
-@media (max-width: 600px) {
+@media (min-width: 768px) {
   .App {
-    padding: 1rem;
+    padding: 2rem;
+    gap: 1.5rem;
   }
-
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
   .game-info {
-    flex-direction: column;
-    gap: 0.8rem;
+    font-size: 1rem;
+    padding: 1.25rem 2rem;
   }
 }

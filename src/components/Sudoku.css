@@ -12,8 +12,9 @@
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
 
-  width: 600px;              /* 🔥 Increased size */
-  height: 600px;             /* 🔥 Increased size */
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1 / 1;
 
   background: rgba(255, 255, 255, 0.95);
   border: 4px solid #111;

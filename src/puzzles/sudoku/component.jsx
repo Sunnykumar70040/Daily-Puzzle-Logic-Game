@@ -87,8 +87,35 @@ const SudokuComponent = ({ gameState, initialGrid, onMove, isSolved, checkResult
                     })
                 ))}
             </div>
+
+            <div className="numpad">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                    <button
+                        key={num}
+                        className="num-btn"
+                        onClick={() => {
+                            if (selectedCell) {
+                                updateCell(selectedCell.row, selectedCell.col, num);
+                            }
+                        }}
+                    >
+                        {num}
+                    </button>
+                ))}
+                <button
+                    className="num-btn clear-btn"
+                    onClick={() => {
+                        if (selectedCell) {
+                            updateCell(selectedCell.row, selectedCell.col, null);
+                        }
+                    }}
+                >
+                    X
+                </button>
+            </div>
+
             <div className="controls-hint">
-                Click a cell and type 1-9. Use arrows to move.
+                Select a cell and use the number pad or keyboard to input values.
             </div>
         </div>
     );

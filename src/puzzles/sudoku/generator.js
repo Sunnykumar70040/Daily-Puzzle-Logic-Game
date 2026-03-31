@@ -1,8 +1,10 @@
 const isValid = (board, row, col, num) => {
+    // Check row and column
     for (let x = 0; x < 9; x++) {
         if (board[row][x] === num || board[x][col] === num) return false;
     }
 
+    // Check 3x3 box
     const startRow = Math.floor(row / 3) * 3;
     const startCol = Math.floor(col / 3) * 3;
 
@@ -15,6 +17,7 @@ const isValid = (board, row, col, num) => {
     return true;
 };
 
+// Fills board randomly using rng to create a valid full sudoku board
 const solveSudoku = (board, rng) => {
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
@@ -35,28 +38,81 @@ const solveSudoku = (board, rng) => {
     return true;
 };
 
+// Counts the number of valid solutions for a given board (early exit if > 1)
+const countSolutions = (board) => {
+    let count = 0;
+    
+    // Fast in-place solver for counting
+    const solve = () => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] === 0) {
+                    for (let num = 1; num <= 9; num++) {
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num;
+                            solve();
+                            board[row][col] = 0;
+                            if (count > 1) return; // Optimization: we only care if it's strictly 1
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+        count++;
+    };
+    
+    solve();
+    return count;
+};
+
 export const generateSudokuPuzzle = (rng, difficulty = 'Easy') => {
+    // 1. Generate full completed board
     const fullBoard = Array(9).fill().map(() => Array(9).fill(0));
     solveSudoku(fullBoard, rng);
 
+    // 2. Clone it for the puzzle
     const puzzle = fullBoard.map(row => [...row]);
 
-    let cellsToRemove;
+    // 3. Determine how many cells to remove based on difficulty
+    let targetEmptyCells;
     switch (difficulty) {
-        case 'Easy': cellsToRemove = 30; break;
-        case 'Medium': cellsToRemove = 40; break;
-        case 'Hard': cellsToRemove = 50; break;
-        default: cellsToRemove = 30;
+        case 'Easy': targetEmptyCells = 35; break;
+        case 'Medium': targetEmptyCells = 45; break;
+        case 'Hard': targetEmptyCells = 55; break;
+        default: targetEmptyCells = 35;
     }
 
-    for (let i = 0; i < cellsToRemove; i++) {
-        let row = rng.range(0, 8);
-        let col = rng.range(0, 8);
-        while (puzzle[row][col] === 0) {
-            row = rng.range(0, 8);
-            col = rng.range(0, 8);
+    // 4. Create a list of all positions and shuffle them
+    const positions = [];
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            positions.push({ r, c });
         }
-        puzzle[row][col] = 0;
+    }
+    const shuffledPositions = rng.shuffle(positions);
+
+    // 5. Try to remove cells one by one while guaranteeing unique solution
+    let removed = 0;
+    for (let i = 0; i < shuffledPositions.length; i++) {
+        if (removed >= targetEmptyCells) break;
+
+        const { r, c } = shuffledPositions[i];
+        const backup = puzzle[r][c];
+        
+        // Temporarily remove
+        puzzle[r][c] = 0;
+        
+        // Check if removing this cell creates multiple solutions
+        // We must clone the grid because countSolutions modifies the board during tracking
+        const copyBoard = puzzle.map(row => [...row]);
+        
+        if (countSolutions(copyBoard) !== 1) {
+            // Revert removal if solution is no longer unique
+            puzzle[r][c] = backup;
+        } else {
+            removed++;
+        }
     }
 
     const initialState = {
@@ -66,7 +122,7 @@ export const generateSudokuPuzzle = (rng, difficulty = 'Easy') => {
 
     return {
         type: 'sudoku',
-        signature: 'v1-' + rng.random(),
+        signature: 'v2-' + rng.random(),
         initialGrid: puzzle,
         solution: fullBoard,
         initialState,

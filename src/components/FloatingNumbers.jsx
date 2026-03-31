@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 
 const FloatingNumbers = () => {
     const [numbers, setNumbers] = useState([]);
 
     useEffect(() => {
         // Generate initial numbers
-        const initialNumbers = Array.from({ length: 20 }, (_, i) => ({
+        const initialNumbers = Array.from({ length: 30 }, (_, i) => ({
             id: i,
             value: Math.floor(Math.random() * 9) + 1,
             left: Math.random() * 100,
-            animationDuration: Math.random() * 10 + 10, // 10-20s
-            delay: Math.random() * 5,
-            fontSize: Math.random() * 2 + 1, // 1-3rem
-            opacity: Math.random() * 0.3 + 0.1
+            animationDuration: Math.random() * 15 + 10, // 10-25s
+            delay: Math.random() * 10,
+            fontSize: Math.random() * 2.5 + 1.5, // 1.5-4rem
+            customOpacity: Math.random() * 0.4 + 0.1
         }));
         setNumbers(initialNumbers);
     }, []);
+
+    const handleClick = (id) => {
+        setNumbers(prev => prev.map(n => 
+            n.id === id ? { ...n, value: Math.floor(Math.random() * 9) + 1, customOpacity: 1, fontSize: n.fontSize + 1 } : n
+        ));
+    };
 
     return (
         <div className="floating-numbers-container">
@@ -28,8 +34,9 @@ const FloatingNumbers = () => {
                         animationDuration: `${num.animationDuration}s`,
                         animationDelay: `${num.delay}s`,
                         fontSize: `${num.fontSize}rem`,
-                        opacity: num.opacity
+                        '--custom-opacity': num.customOpacity
                     }}
+                    onClick={() => handleClick(num.id)}
                 >
                     {num.value}
                 </div>
@@ -38,4 +45,4 @@ const FloatingNumbers = () => {
     );
 };
 
-export default FloatingNumbers;
+export default memo(FloatingNumbers);

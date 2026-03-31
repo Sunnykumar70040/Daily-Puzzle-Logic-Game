@@ -2,56 +2,69 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    width: 100%;
+    max-width: 500px; /* Limit max size on desktop */
+    margin: 0 auto;
+    gap: 1.25rem;
 }
 
+/* The board resizes automatically to fit screen width while maintaining squarish aspect ratio */
 .sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    gap: 2px;
+    grid-template-rows: repeat(9, 1fr);
+    width: 100%;
+    aspect-ratio: 1 / 1;
     background-color: var(--grid-line);
-    border: 2px solid var(--grid-line);
-    max-width: 500px;
-    width: 160%;
-    /* Remove aspect-ratio to prevent squashing on some browsers, control height via cells */
+    border: 2px solid var(--text-primary);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    margin-left: -0%;
-    /* (160%-100%)/2 = 30% offset to center oversized element */
+    box-shadow: var(--shadow-md);
+    gap: 1px; /* Thinner lines inside the grid */
+    padding: 2px;
+}
+
+.sudoku-board.solved {
+    box-shadow: 0 0 20px var(--success-color);
+    border-color: var(--success-color);
+    transition: all 0.5s ease-out;
 }
 
 .sudoku-cell {
     background-color: var(--cell-bg);
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    font-weight: 600;
+    align-items: center;
+    font-size: clamp(1rem, 4vw, 1.75rem); /* Fluid typography */
+    font-weight: 500;
+    color: var(--text-primary);
     cursor: pointer;
     user-select: none;
-    transition: all 0.2s;
-    color: var(--text-primary);
-    aspect-ratio: 1/1;
-    /* Force square cells */
-    min-width: 0;
-    /* Prevent overflow */
-    min-height: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.sudoku-cell:hover {
+/* Thick borders for 3x3 blocks */
+.sudoku-cell.border-right {
+    border-right: 2px solid var(--grid-line);
+}
+.sudoku-cell.border-bottom {
+    border-bottom: 2px solid var(--grid-line);
+}
+
+/* Hover, Focus, Selected states */
+.sudoku-cell:hover:not(.initial) {
     background-color: var(--cell-highlight);
 }
 
 .sudoku-cell.selected {
-    background-color: rgba(74, 144, 226, 0.2);
-    box-shadow: inset 0 0 0 2px var(--primary-color);
+    background-color: var(--cell-highlight);
 }
 
+/* Differentiate user inputs from initial clues */
 .sudoku-cell.initial {
-    background-color: rgb(27, 29, 58);
-    color: var(--text-secondary);
     font-weight: 700;
+    color: var(--text-primary);
+    background-color: var(--cell-active);
 }
 
 .sudoku-cell.user-input {
@@ -59,27 +72,65 @@
 }
 
 .sudoku-cell.error {
-    background-color: rgba(255, 75, 75, 0.2);
+    color: var(--error-color);
+    background-color: rgba(248, 81, 73, 0.1);
+    animation: shake 0.3s ease-in-out;
+}
+
+/* Numpad styles for mobile-first interaction */
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.num-btn {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 0.75rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.num-btn:active {
+    transform: scale(0.92);
+    background-color: var(--cell-active);
+}
+
+.num-btn.clear-btn {
     color: var(--error-color);
 }
 
-.sudoku-cell.border-right {
-    border-right: 2px solid var(--grid-line);
-}
-
-.sudoku-cell.border-bottom {
-    border-bottom: 2px solid var(--grid-line);
-}
-
 .controls-hint {
-    margin-top: 1rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 0.5rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    .sudoku-cell {
-        font-size: 1.2rem;
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+}
+
+@media (min-width: 480px) {
+    .numpad {
+        gap: 0.75rem;
+    }
+    .num-btn {
+        padding: 1rem 0;
+        font-size: 1.5rem;
     }
 }

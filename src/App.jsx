@@ -8,9 +8,9 @@ axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 
 import GameBoard from "./components/GameBoard";
 import Navbar from "./components/Navbar";
-import FloatingNumbers from "./components/FloatingNumbers";
 import Footer from "./components/Footer";
 import HeatmapContainer from "./components/heatmap/HeatmapContainer";
+import FloatingNumbers from "./components/FloatingNumbers";
 
 ////////////////////////////////////////////////////////////
 // LOGIN PAGE
@@ -299,12 +299,30 @@ function LeaderboardPage() {
 }
 
 ////////////////////////////////////////////////////////////
-// HOME PAGE (UNCHANGED)
+// HOME PAGE
 ////////////////////////////////////////////////////////////
+
+const GameTimer = ({ isGameActive }) => {
+  const [timer, setTimer] = useState(0);
+  useEffect(() => {
+    let interval;
+    if (isGameActive) {
+      interval = setInterval(() => setTimer(prev => prev + 1), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isGameActive]);
+
+  const formatTime = (s) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  return <div className="timer">{formatTime(timer)}</div>;
+};
 
 function Home({ selectedDate }) {
   const [difficulty, setDifficulty] = useState("Easy");
-  const [timer, setTimer] = useState(0);
   const [isGameActive, setIsGameActive] = useState(true);
   const [mistakes, setMistakes] = useState(0);
   const [seed, setSeed] = useState(null);
@@ -330,20 +348,6 @@ function Home({ selectedDate }) {
     });
   }, [selectedDate]);
 
-  useEffect(() => {
-    let interval;
-    if (isGameActive) {
-      interval = setInterval(() => setTimer(prev => prev + 1), 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isGameActive]);
-
-  const formatTime = (s) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  };
-
   return (
     <motion.div className="App">
       <FloatingNumbers />
@@ -362,8 +366,8 @@ function Home({ selectedDate }) {
             <option>Hard</option>
           </select>
         </div>
-        <div>Mistakes: {mistakes}/3</div>
-        <div>{formatTime(timer)}</div>
+        <div className="mistakes">Mistakes: {mistakes}/3</div>
+        <GameTimer isGameActive={isGameActive} />
       </div>
 
       {seed && (
